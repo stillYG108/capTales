@@ -9,6 +9,7 @@
 
 #include "../include/ethernet.h"
 #include "../include/ipv4.h"
+#include "../include/ipv6.h"
 
 void parsing_the_ethernet_frame(unsigned char *packet, ssize_t packet_len, int ifindex){
    if (packet_len < (ssize_t)sizeof(struct ethhdr)) {
@@ -36,5 +37,7 @@ void parsing_the_ethernet_frame(unsigned char *packet, ssize_t packet_len, int i
                         packet_len - (ssize_t)sizeof(struct ethhdr));
    } else if (ntohs(eth->h_proto) == ETH_P_IPV6) {
       printf("This is an IPv6 packet!\n");
+      parsing_the_ipv6_packet(packet + sizeof(struct ethhdr),
+                        packet_len - (ssize_t)sizeof(struct ethhdr));
    }
 }
