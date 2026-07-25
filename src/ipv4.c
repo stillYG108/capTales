@@ -8,7 +8,7 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h> 
 #include "../include/ipv4.h"
-
+#include "../include/handler.h"
 
 void parsing_the_ipv4_packet(unsigned char *packet, ssize_t packet_len){
     
@@ -34,4 +34,13 @@ void parsing_the_ipv4_packet(unsigned char *packet, ssize_t packet_len){
    printf("   |-Checksum       : %d\n", ntohs(ip->check));
    printf("   |-Source IP      : %s\n", inet_ntoa(src_addr));
    printf("   |-Destination IP : %s\n", inet_ntoa(dest_addr));
+
+   /* Route the packet to the appropriate handler based on its protocol */
+   route_ip_packet(ip->protocol, &(packet_ctx_t){
+       .payload = packet + (ip->ihl * 4),
+       .length = ntohs(ip->tot_len) - (ip->ihl * 4),
+       .src_ip_v4 = ip->saddr,
+       .dst_ip_v4 = ip->daddr,
+       .is_ipv6 = 0
+   });
 }

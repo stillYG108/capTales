@@ -8,6 +8,7 @@
 #include <netinet/ip6.h>
 #include <arpa/inet.h> 
 #include "../include/ipv6.h"
+#include "../include/handler.h"
 
 
 void parsing_the_ipv6_packet(unsigned char *packet, ssize_t packet_len){
@@ -34,4 +35,13 @@ void parsing_the_ipv6_packet(unsigned char *packet, ssize_t packet_len){
    printf("   |-Hop Limit      : %d\n", (unsigned int)ip6->ip6_hlim);
    printf("   |-Source IP      : %s\n", src_addr);
    printf("   |-Destination IP : %s\n", dest_addr);
+
+    /* Route the packet to the appropriate handler based on its next header */
+    route_ip_packet(ip6->ip6_nxt, &(packet_ctx_t){
+         .payload = packet + sizeof(struct ip6_hdr),
+         .length = ntohs(ip6->ip6_plen),
+         .src_ip_v6 = {0},
+         .dst_ip_v6 = {0},
+         .is_ipv6 = 1
+    });
 }
