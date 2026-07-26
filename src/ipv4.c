@@ -19,6 +19,18 @@ void parsing_the_ipv4_packet(unsigned char *packet, ssize_t packet_len){
       return;
    }
 
+   unsigned int ihl_bytes = ip->ihl * 4;
+   if (ip->ihl < 5 || ihl_bytes < sizeof(struct iphdr) || ihl_bytes > (unsigned int)packet_len) {
+      printf("Invalid IPv4 header length: %u bytes\n", ihl_bytes);
+      return;
+   }
+
+   unsigned short total_len = ntohs(ip->tot_len);
+   if (total_len < ihl_bytes || total_len > (unsigned short)packet_len) {
+      printf("Invalid IPv4 total length: %u bytes\n", total_len);
+      return;
+   }
+
    struct in_addr src_addr, dest_addr;
    src_addr.s_addr = ip->saddr;
    dest_addr.s_addr = ip->daddr;
@@ -37,8 +49,8 @@ void parsing_the_ipv4_packet(unsigned char *packet, ssize_t packet_len){
 
    /* Route the packet to the appropriate handler based on its protocol */
    route_ip_packet(ip->protocol, &(packet_ctx_t){
-       .payload = packet + (ip->ihl * 4),
-       .length = ntohs(ip->tot_len) - (ip->ihl * 4),
+       .payload = packet + ihl_bytes,
+       .length = total_len - ihl_bytes,
        .src_ip_v4 = ip->saddr,
        .dst_ip_v4 = ip->daddr,
        .is_ipv6 = 0

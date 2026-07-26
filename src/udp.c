@@ -21,6 +21,11 @@ void parsing_the_udp_segment(const packet_ctx_t *ctx) {
         return;
     }
 
+    if (ctx->length < sizeof(struct udphdr)) {
+        printf("Truncated UDP datagram (length: %zu)\n", ctx->length);
+        return;
+    }
+
     struct udphdr *udp = (struct udphdr *)(ctx->payload);
     printf("Source Port: %d\n", ntohs(udp->source));
     printf("Dest Port: %d\n", ntohs(udp->dest));

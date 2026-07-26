@@ -37,11 +37,12 @@ void parsing_the_ipv6_packet(unsigned char *packet, ssize_t packet_len){
    printf("   |-Destination IP : %s\n", dest_addr);
 
     /* Route the packet to the appropriate handler based on its next header */
-    route_ip_packet(ip6->ip6_nxt, &(packet_ctx_t){
-         .payload = packet + sizeof(struct ip6_hdr),
-         .length = ntohs(ip6->ip6_plen),
-         .src_ip_v6 = {0},
-         .dst_ip_v6 = {0},
-         .is_ipv6 = 1
-    });
+    packet_ctx_t ctx = {0};
+    ctx.payload = packet + sizeof(struct ip6_hdr);
+    ctx.length = ntohs(ip6->ip6_plen);
+    ctx.is_ipv6 = 1;
+    memcpy(ctx.src_ip_v6, &ip6->ip6_src, sizeof(ctx.src_ip_v6));
+    memcpy(ctx.dst_ip_v6, &ip6->ip6_dst, sizeof(ctx.dst_ip_v6));
+
+    route_ip_packet(ip6->ip6_nxt, &ctx);
 }

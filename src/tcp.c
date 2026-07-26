@@ -20,6 +20,11 @@ void parcing_the_tcp_segment(const packet_ctx_t *ctx) {
     if (ctx == NULL || ctx->payload == NULL) {
         return;
     }
+
+    if (ctx->length < sizeof(struct tcphdr)) {
+        printf("Truncated TCP segment (length: %zu)\n", ctx->length);
+        return;
+    }
         
     struct tcphdr *tcp = (struct tcphdr *)(ctx->payload);
     printf("Source Port: %d\n", ntohs(tcp->source));
