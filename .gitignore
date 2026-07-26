@@ -1,0 +1,7 @@
+# Ignore the entire .vscode folder by default
+.vscode/*
+
+# Allow specific files that benefit the team
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
